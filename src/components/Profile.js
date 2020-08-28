@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import profile_img from '../images/profile.png';
+import defaultProfile from "../images/profileLogo.png";
 import { Link } from 'react-router-dom';
 import fire from './Fire';
 
@@ -74,7 +75,7 @@ export class Profile extends Component {
         const { programs, savedPrograms, username, email } = this.state;
         return (
             <div className='profile-container'>
-                <img className='profile-img' src={profile_img} alt='profile'/>
+                <img className='profile-img' src={defaultProfile} alt='profile'/>
                 <div className='profile-table-container'>
                     <table className='profile-table'>
                         <tbody>

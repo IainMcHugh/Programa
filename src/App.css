@@ -150,18 +150,10 @@
 }
 
 @media only screen and (min-width: 768px){
-  
-  .App {
-    background-color: green;
-  }
 
 }
 
 @media only screen and (min-width: 1200px){
-
-  .App { 
-    background-color: black;
-  }
 
   .login-form-container{
     width: 800px;
@@ -614,6 +606,8 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  border-radius: 300px;
+  background-color: #61dafb;
 }
 
 .profile-table {
