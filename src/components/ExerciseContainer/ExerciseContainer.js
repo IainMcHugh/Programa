@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import fire from './Fire';
+import fire from '../../API/Fire';
 
 class ExerciseContainer extends Component {
 

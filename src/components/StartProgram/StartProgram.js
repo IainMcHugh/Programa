@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Link } from 'react-router-dom';
-import fire from './Fire';
+import fire from '../../API/Fire';
 
 export class StartProgram extends Component {
 

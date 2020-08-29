@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Exercise from './Exercise';
-import fire from './Fire';
+import Exercise from '../Exercises/Exercise';
+import fire from '../../API/Fire';
 import { Link, Redirect } from 'react-router-dom';
 
 class CreateProgram extends Component {

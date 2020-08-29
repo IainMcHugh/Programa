@@ -1,49 +1,21 @@
-import React, { Component } from 'react';
-import './App.css';
-import fire from './components/Fire';
-import Home from './components/Home';
-import Login from './components/Login';
+import React, { useState, useEffect } from "react";
+import Firebase from "./API/Fire";
+import Auth from "./components/Auth/Auth";
+import Home from "./components/Home/Home";
 
-class App extends Component {
+import "./App.css";
 
-  constructor(props) {
-    super(props)
-  
-    this.state = {
-       user: {}
+const App = () => {
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const unsubscribe = Firebase.onAuthStateChange(setUser);
+    return () => {
+      unsubscribe();
     }
-  }
-  
-  componentDidMount() {
-    this.authListener();
-  }
+  },[]);
 
-  authListener() {
-    fire.auth().onAuthStateChanged((user) => {
-      console.log(user);
-      if (user) {
-        console.log("There is a user");
-        this.setState({
-          user
-        });
-        localStorage.setItem('user', user.uid);
-      } else {
-        console.log("There is NOT a user");
-        this.setState({
-          user: null
-        })
-        localStorage.removeItem('user');
-      }
-    });
-  }
-
-  render() {
-    return (
-      <div className="App">
-        {this.state.user ? (<Home />) : (<Login />)}
-      </div>
-    );  
-  }
-}
+  return <div className="App">{user ? <Home /> : <Auth />}</div>;
+};
 
 export default App;
