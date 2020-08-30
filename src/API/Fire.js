@@ -41,6 +41,10 @@ class Firebase {
     return this.auth.signOut();
   }
 
+  checkUid(data){
+    return this.auth.currentUser.uid === data;
+  }
+
   // Database - Profile
 
   addNewUser(currentUser, email, username) {
@@ -50,6 +54,12 @@ class Firebase {
   getUserData() {
     return this.database
       .ref("/users/" + this.auth.currentUser.uid)
+      .once("value");
+  }
+
+  getUserSavedPrograms() {
+    return this.database
+      .ref("/users/" + this.auth.currentUser.uid +"/saved_programs/")
       .once("value");
   }
 
@@ -77,10 +87,27 @@ class Firebase {
       .once("value");
   }
 
+  createEvents(updates){
+    this.database.ref('users/' + this.auth.currentUser.uid + '/routine/').update(updates);
+  }
+
+  saveProgram(updates){
+    this.database.ref('users/' + this.auth.currentUser.uid + '/saved_programs/').update(updates);
+  }
+
+  removeSavedProgram(programID){
+    this.database
+      .ref("/users/" + this.auth.currentUser.uid + "/saved_programs/" + programID).remove()
+  }
+
   // Database - exercises
 
   getExercises() {
     return this.database.ref("/exercises/").orderByKey().once("value");
+  }
+
+  getExercise(exerciseID) {
+    return this.database.ref("/exercises/" + exerciseID).once("value");
   }
 
   // Database - routine
@@ -91,10 +118,8 @@ class Firebase {
       .once("value");
   }
 
-  deleteUserEvent(eventKey) {
-    console.log(eventKey);
-    return this.database
-      .ref("/users/" + this.auth.currentUser.uid + "/routine/" + eventKey).remove();
+  updateUserEvents(events){
+    this.database.ref("/users/" + this.auth.currentUser.uid + "/routine/").set(events);
   }
 }
 

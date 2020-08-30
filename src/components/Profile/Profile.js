@@ -44,7 +44,7 @@ const Profile = () => {
       <h2>Your Programs</h2>
       <div className="profile-programs-container">
         {programs &&
-          Object.keys(programs).map((program, index) => {
+          Object.keys(programs).map(program => {
             return (
               <Link
                 className="program-container-link"
@@ -63,7 +63,7 @@ const Profile = () => {
       </div>
       <h2>Saved Programs</h2>
       <div className="profile-programs-container">
-        {savedPrograms && Object.keys(savedPrograms).map((program) => {
+        {savedPrograms && Object.keys(savedPrograms).map(program => {
           return (
             <Link
               className="program-container-link"
@@ -71,7 +71,7 @@ const Profile = () => {
               key={program}
             >
               <div className="program-container" key={program}>
-                <h2>{programs[program]}</h2>
+                <h2>{savedPrograms[program]}</h2>
               </div>
             </Link>
           );

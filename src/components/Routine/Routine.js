@@ -7,123 +7,6 @@ import fire from "../../API/Fire";
 // import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "react-big-calendar/lib/sass/styles.scss";
 
-// export class Routine extends React.Component {
-
-//     constructor(props) {
-//         super(props)
-
-//         this.state = {
-//              date: new Date(),
-//              ColoredDateCellWrapper: null,
-//              myEvents: [],
-//              eventsRecieved: false,
-//              selectedEvent: {},
-//              isRepeatEvent: false,
-//              isDone: false,
-//              repeat_start: null,
-//              repeat_end: null,
-//              showEventDetail: false,
-//              createEvent: false,
-//              slotStartDate: new Date(),
-//              slotEndDate: new Date(),
-//              isRoutineNow: false,
-//              scheduledEvent: null,
-//         }
-//     }
-
-//     componentDidMount(){
-//         this.setState({
-//                 ColoredDateCellWrapper: ({ children }) =>
-//             React.cloneElement(React.Children.only(children), {
-//                 style: {
-//                 backgroundColor: '#282c34',
-//                 },
-//             })
-//         })
-
-//         fire.auth().onAuthStateChanged( user => {
-//             if (user) {
-//                 let uid = user.uid;
-//                 let database = fire.database();
-//                 let eventHolder = [];
-//                 database.ref('/users/' + uid + '/routine').once('value').then((snap) => {
-//                     console.log(snap.val());
-//                     snap.forEach((childSnap) => {
-//                         let eventObjectHolder =
-//                         {
-//                             'key': '',
-//                             'id': '',
-//                             'title': '',
-//                             'start': new Date(),
-//                             'end': new Date(),
-//                             'desc': '',
-//                             'isrepeat': false,
-//                             'isdone': false,
-//                             'repeat_start': 0,
-//                             'repeat_end': 0
-//                         }
-//                         eventObjectHolder['key'] = childSnap.key;
-//                         eventObjectHolder['id'] = childSnap.val().id;
-//                         eventObjectHolder['title'] = childSnap.val().title;
-//                         eventObjectHolder['start'] = new Date(childSnap.val().start);
-//                         eventObjectHolder['end'] = new Date(childSnap.val().end);
-//                         eventObjectHolder['desc'] = childSnap.val().desc;
-//                         eventObjectHolder['isrepeat'] = childSnap.val().isrepeat;
-//                         eventObjectHolder['isdone'] = childSnap.val().isdone;
-//                         eventObjectHolder['repeat_start'] = childSnap.val().repeat_start;
-//                         eventObjectHolder['repeat_end'] = childSnap.val().repeat_end;
-
-//                         console.log("1: "+eventObjectHolder['start']);
-//                         console.log("2: "+eventObjectHolder['start']);
-//                         console.log("3: "+new Date());
-
-//                         if(moment(new Date()).isBetween(eventObjectHolder['start'], eventObjectHolder['end'])) {
-//                             console.log("There is an Event Now!");
-//                             if(eventObjectHolder['isdone']){
-//                                 this.setState({
-//                                     isRoutineNow: false,
-//                                     scheduledEvent: eventObjectHolder
-//                                 });
-//                             }else{
-//                                 this.setState({
-//                                     isRoutineNow: true,
-//                                     scheduledEvent: eventObjectHolder
-//                                 })
-//                             }
-
-//                         }
-//                         eventHolder.push(eventObjectHolder);
-//                     });
-
-//                     // console.log(eventHolder);
-
-//                     this.setState({
-//                         myEvents: eventHolder,
-//                         // eventsRecieved: true
-//                     });
-//                 });
-
-//             }
-//         });
-//     }
-
-//     /* When you choose a particular slot on the calendar */
-//     onSlotChange(slotInfo) {
-//         // var startDate = moment(slotInfo.start.toLocaleString()).format("YYYY-MM-DD HH:mm:ss");
-//         // var endDate = moment(slotInfo.end.toLocaleString()).format("YYYY-MM-DD HH:mm:ss");
-//         console.log(moment(slotInfo.end.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss"));
-//         var startDate = moment(slotInfo.start.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss");
-//         var endDate = moment(slotInfo.end.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss");
-//         this.setState({
-//             createEvent: true,
-//             slotStartDate: startDate,
-//             slotEndDate: endDate,
-//         })
-
-//         // console.log('startTime', startDate); //shows the start time chosen
-//         // console.log('endTime', endDate); //shows the end time chosen
-//     }
-
 //     addEvent = (e) => {
 //         e.preventDefault();
 //         console.log(e.target.elements.repeat.value); //norepeat or yesrepeat
@@ -237,195 +120,6 @@ import "react-big-calendar/lib/sass/styles.scss";
 //         })
 //     }
 
-//     /* When you click on an already booked slot */
-//     onEventClick(event) {
-//         console.log(event) //Shows the event details provided while booking
-//         if (event.isrepeat){
-//             this.setState({
-//                 isRepeatEvent: true,
-//                 repeat_start: event.repeat_start,
-//                 repeat_end: event.repeat_end
-//             });
-//         }
-//         this.setState({
-//             selectedEvent: event,
-//             showEventDetail: true
-//         });
-//     }
-
-//     onEventExit(event) {
-//         this.setState({
-//             showEventDetail: false
-//         });
-//     }
-
-//     onChange = (date) => {
-//         console.log(date);
-//         this.setState({
-//             date
-//         })
-//     }
-
-//     deleteThisEvent = (e) => {
-//         // delete the Event from the myEvents object
-//         const prevMyEvents = this.state.myEvents;
-//         const currEvent = this.state.selectedEvent;
-//         let count = 0;
-//         prevMyEvents.forEach((prevEvent) => {
-//             if (prevEvent.key == currEvent.key){
-//                 // remove this index of prevMyEvents
-//                 prevMyEvents.splice(count, 1);
-//             }
-//             count++;
-//         });
-//         this.setState({
-//             myEvents: prevMyEvents
-//         });
-
-//         // go to firebase, delete entry that matches selected Event
-//         // find based on 'start' value
-
-//         console.log(currEvent.key)
-//         fire.auth().onAuthStateChanged( user => {
-//             if (user) {
-//                 let uid = user.uid;
-//                 let database = fire.database();
-//                 database.ref('/users/' + uid + '/routine/' + currEvent.key).remove();
-
-//             }
-//         });
-//         this.setState({
-//             showEventDetail: false
-//         });
-//     }
-
-//     deleteRepeatEvent = (e) => {
-//         // TODO: Fix edge case where delete one then delete repeat
-//         // delete the Event from the myEvents object
-//         const prevMyEvents = this.state.myEvents;
-//         const currEvent = this.state.selectedEvent;
-//         const prevRepeatStart = this.state.repeat_start;
-//         const prevRepeatEnd = this.state.repeat_end;
-//         const repeatArray = []
-//         for (let i = prevRepeatStart; i <= prevRepeatEnd; i++){
-//             repeatArray.push(i);
-//         }
-//         console.log(repeatArray);
-//         let n = 0;
-//         while(n < prevMyEvents.length -1){
-//             prevMyEvents.reverse();
-//             if(prevMyEvents[n].key in repeatArray){
-//                 console.log("Key is in array: " + prevMyEvents[n].key);
-//                 // remove this index of prevMyEvents
-//                 prevMyEvents.splice(n, 1);
-//             } else n++;
-//             prevMyEvents.reverse();
-//         }
-//         console.log(prevMyEvents)
-//         this.setState({
-//             myEvents: prevMyEvents
-//         });
-
-//         // go to firebase, delete entry that matches selected Event
-//         // find based on 'start' value
-//         console.log(currEvent.key)
-//         fire.auth().onAuthStateChanged( user => {
-//             if (user) {
-//                 let uid = user.uid;
-//                 let database = fire.database();
-//                 for(let i in repeatArray){
-//                     console.log(i);
-//                     database.ref('/users/' + uid + '/routine/' + repeatArray[i]).remove();
-//                 }
-//             }
-//         });
-//         this.setState({
-//             showEventDetail: false
-//         });
-//     }
-
-//     render() {
-//         const localizer = momentLocalizer(moment);
-//         const { showEventDetail, selectedEvent, isRepeatEvent, isDone, createEvent, slotStartDate, slotEndDate, isRoutineNow, scheduledEvent } = this.state;
-//         return (
-//             <div className='routine-background'>
-//                 <div className='routine-container'>
-//                     <div className='routine-daily-schedule'>
-//                         <Calendar
-//                             localizer={localizer}
-//                             events={this.state.myEvents}
-//                             startAccessor="start"
-//                             endAccessor="end"
-//                             // onSelectEvent={()=>alert("Selected!")}
-//                             views={['month', 'day', 'agenda']}
-//                             selectable
-//                             onSelectEvent={event => this.onEventClick(event)}
-//                             onSelectSlot={(slotInfo) => this.onSlotChange(slotInfo) }
-//                             popup={true}
-//                             components={{
-//                                 timeSlotWrapper: this.state.ColoredDateCellWrapper,
-//                                 event: Event,
-//                                 agenda: {
-//                                         event: EventAgenda
-//                                     }
-//                             }}
-//                             style={{ height: 500 }}
-//                             />
-//                     </div>
-//                 </div>
-//                 {
-//                     showEventDetail ?
-//                     <div className='createEvent-container'>
-//                         <h2>{selectedEvent.title}</h2>
-//                         <button onClick={this.deleteThisEvent}>Delete this Event</button>
-//                         {
-//                             isRepeatEvent ?
-//                             <button onClick={this.deleteRepeatEvent}>Delete all occurences of Event</button>
-//                             :
-//                             <div></div>
-//                         }
-//                         <button onClick={event=>this.onEventExit(event)}>Close</button>
-//                     </div>
-//                     :
-//                     <div></div>
-//                 }
-//                 { createEvent ?
-//                     <div className='createEvent-container'>
-//                         <form onSubmit={this.addEvent}>
-//                             <h2 className='createEvent-heading'>NO PROGRAM NAME</h2>
-//                             <label>Start Date</label>
-//                             <input type='datetime-local' defaultValue={slotStartDate} required name='beginentry' id='start-date'/>
-//                             <label>End Date</label>
-//                             <input type='datetime-local' defaultValue={slotEndDate} required name='endentry' id='create-event-end-date'/>
-
-//                             <p>Repeat Event</p>
-//                             <input type='radio' id='yesrepeat' name='repeat' value='yesrepeat' />
-//                             <label for='yesrepeat'>Repeat</label>
-//                             <input type='radio' id='norepeat' name='repeat' value='norepeat' defaultChecked />
-//                             <label for='norepeat'>Dont Repeat</label>
-//                             <button type='submit'>Add to Calendar</button>
-//                             {/* <button type='button' onClick={()=>this.setState({createEvent: false})}>Cancel</button> */}
-//                         </form>
-//                         <button onClick={()=>this.setState({createEvent: false})}>Cancel</button>
-//                     </div>
-//                     :
-//                     <div></div>
-//                 }
-//                 {
-//                     isRoutineNow ?
-//                     <div>
-//                         <Link to={'programs/' + scheduledEvent.id + '/' + scheduledEvent.key} key={scheduledEvent.id}>
-//                             <button>Start {scheduledEvent.title} Workout Now!</button>
-//                         </Link>
-//                     </div>
-//                     :
-//                     <div>Your all caught up!</div>
-//                 }
-//             </div>
-//         )
-//     }
-// }
-
 const Routine = () => {
   const [events, setEvents] = useState([]);
   const [ColoredDateCellWrapper, setCDCW] = useState(null);
@@ -433,6 +127,9 @@ const Routine = () => {
   const [activeRoutine, setActiveRoutine] = useState({});
   const [selectedEvent, setSelectedEvent] = useState({});
   const [eventInfo, setEventInfo] = useState(false);
+  const [createEvent, setCreateEvent] = useState(false);
+  const [slotStart, setSlotStart] = useState("");
+  const [slotEnd, setSlotEnd] = useState("");
 
   const localizer = momentLocalizer(moment);
 
@@ -444,10 +141,10 @@ const Routine = () => {
           console.log("There is an event now");
           if (event.isdone) {
             setRoutineNow(false);
-            setActiveRoutine(event);
+            setActiveRoutine(event.val());
           } else {
             setRoutineNow(true);
-            setActiveRoutine(event);
+            setActiveRoutine(event.val());
           }
         }
       });
@@ -461,77 +158,62 @@ const Routine = () => {
   };
 
   const handleDeleteEvent = (isRepeat) => {
-      
-    // ***** ADD KEY TO ROUTINE CHILDREN, V IMPORTANT *****
-    // May be more than one occurrence of same event
-    // need to target key and not id for this reason
-      if(!isRepeat){
-          // Delete event from events state
-          let updatedEvents = events.filter(event => event.id !== selectedEvent.id);
-          setEvents(updatedEvents);
-          // Delete event from firebase database
-          fire.deleteUserEvent(selectedEvent.key);
-          setSelectedEvent({});
-          setEventInfo(false);
-      } else {
-        console.log("Work in progress...");
-      }
-  }
+    if (!isRepeat) {
+      // Delete event from events state
+      let updatedEvents = events.filter(
+        (event) => event.key !== selectedEvent.key
+      );
+      console.log(updatedEvents);
+      setEvents(updatedEvents);
+      fire.updateUserEvents(updatedEvents);
+      setSelectedEvent({});
+      setEventInfo(false);
 
-
-//     deleteRepeatEvent = (e) => {
-//         // TODO: Fix edge case where delete one then delete repeat
-//         // delete the Event from the myEvents object
-//         const prevMyEvents = this.state.myEvents;
-//         const currEvent = this.state.selectedEvent;
-//         const prevRepeatStart = this.state.repeat_start;
-//         const prevRepeatEnd = this.state.repeat_end;
-//         const repeatArray = []
-//         for (let i = prevRepeatStart; i <= prevRepeatEnd; i++){
-//             repeatArray.push(i);
-//         }
-//         console.log(repeatArray);
-//         let n = 0;
-//         while(n < prevMyEvents.length -1){
-//             prevMyEvents.reverse();
-//             if(prevMyEvents[n].key in repeatArray){
-//                 console.log("Key is in array: " + prevMyEvents[n].key);
-//                 // remove this index of prevMyEvents
-//                 prevMyEvents.splice(n, 1);
-//             } else n++;
-//             prevMyEvents.reverse();
-//         }
-//         console.log(prevMyEvents)
-//         this.setState({
-//             myEvents: prevMyEvents
-//         });
-
-//         // go to firebase, delete entry that matches selected Event
-//         // find based on 'start' value
-//         console.log(currEvent.key)
-//         fire.auth().onAuthStateChanged( user => {
-//             if (user) {
-//                 let uid = user.uid;
-//                 let database = fire.database();
-//                 for(let i in repeatArray){
-//                     console.log(i);
-//                     database.ref('/users/' + uid + '/routine/' + repeatArray[i]).remove();
-//                 }
-//             }
-//         });
-//         this.setState({
-//             showEventDetail: false
-//         });
-//     }
+      // if Deleting just one event from a repeat event,
+      // need to decrease the repeat_end for remainder
+    } else {
+      console.log("Deleting Repeat Events");
+      // Delete events from events state
+      let repeatArr = Array.from(
+        {
+          length: selectedEvent.repeat_end - selectedEvent.repeat_start + 1,
+        },
+        (x, i) => i + selectedEvent.repeat_start
+      );
+      let updatedEvents = events.filter(
+        (event) => repeatArr.indexOf(event.key) == -1
+      );
+      setEvents(updatedEvents);
+      // Delete events from firebase database
+      fire.updateUserEvents(updatedEvents);
+      setSelectedEvent({});
+      setEventInfo(false);
+    }
+  };
 
   const handleEventExit = (e) => {
     setSelectedEvent({});
     setEventInfo(false);
-  }
+  };
+
+  // When you choose a particular slot on the calendar
+  const onSlotChange = (slotInfo) => {
+    console.log(
+      moment(slotInfo.end.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss")
+    );
+    setSlotStart(
+      moment(slotInfo.start.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss")
+    );
+    setSlotEnd(
+      moment(slotInfo.end.toLocaleString()).format("YYYY-MM-DDTHH:mm:ss")
+    );
+    setCreateEvent(true);
+    // Choose from drop-down of saved programs
+  };
 
   return (
     <div className="routine-background">
-        {console.log(events)}
+      {console.log(events)}
       <div className="routine-container">
         <div className="routine-daily-schedule">
           <Calendar
@@ -542,7 +224,7 @@ const Routine = () => {
             views={["month", "day", "agenda"]}
             selectable
             onSelectEvent={(event) => handleEventSelect(event)}
-            onSelectSlot={(slotInfo) => console.log(slotInfo)}
+            onSelectSlot={(slotInfo) => onSlotChange(slotInfo)}
             popup={true}
             components={{
               //   timeSlotWrapper: ColoredDateCellWrapper,
@@ -558,7 +240,9 @@ const Routine = () => {
       {eventInfo && (
         <div className="createEvent-container">
           <h2>{selectedEvent.title}</h2>
-          <button onClick={() => handleDeleteEvent(false)}>Delete this Event</button>
+          <button onClick={() => handleDeleteEvent(false)}>
+            Delete this Event
+          </button>
           {selectedEvent.isrepeat && (
             <button onClick={() => handleDeleteEvent(true)}>
               Delete all occurences of Event
@@ -615,6 +299,7 @@ const Routine = () => {
       )} */}
       {routineNow && (
         <div>
+          {console.log(activeRoutine)}
           <Link
             to={"programs/" + activeRoutine.id + "/" + activeRoutine.key}
             key={activeRoutine.id}
