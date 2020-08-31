@@ -41,7 +41,7 @@ class Firebase {
     return this.auth.signOut();
   }
 
-  checkUid(data){
+  checkUid(data) {
     return this.auth.currentUser.uid === data;
   }
 
@@ -59,7 +59,7 @@ class Firebase {
 
   getUserSavedPrograms() {
     return this.database
-      .ref("/users/" + this.auth.currentUser.uid +"/saved_programs/")
+      .ref("/users/" + this.auth.currentUser.uid + "/saved_programs/")
       .once("value");
   }
 
@@ -82,22 +82,53 @@ class Firebase {
   }
 
   getProgram(programID) {
-    return this.database
-      .ref("/programs/" + programID)
-      .once("value");
+    return this.database.ref("/programs/" + programID).once("value");
   }
 
-  createEvents(updates){
-    this.database.ref('users/' + this.auth.currentUser.uid + '/routine/').update(updates);
-  }
-
-  saveProgram(updates){
-    this.database.ref('users/' + this.auth.currentUser.uid + '/saved_programs/').update(updates);
-  }
-
-  removeSavedProgram(programID){
+  createEvents(updates) {
     this.database
-      .ref("/users/" + this.auth.currentUser.uid + "/saved_programs/" + programID).remove()
+      .ref("users/" + this.auth.currentUser.uid + "/routine/")
+      .update(updates);
+  }
+
+  saveProgram(updates) {
+    this.database
+      .ref("users/" + this.auth.currentUser.uid + "/saved_programs/")
+      .update(updates);
+  }
+
+  removeSavedProgram(programID) {
+    this.database
+      .ref(
+        "/users/" + this.auth.currentUser.uid + "/saved_programs/" + programID
+      )
+      .remove();
+  }
+
+  createProgramKey() {
+    const pkey = this.database.ref().child("programs").push().key;
+    return pkey;
+  }
+
+  async publishProgram(name, description, programEx) {
+    const programKey = await this.createProgramKey();
+    let program = {
+      key: programKey,
+      name: name,
+      description: description,
+      author: this.auth.currentUser.uid,
+      rating: 0,
+      review: 0,
+      uses: 0,
+      timestamp: Date.now(),
+      exercises: programEx,
+    };
+
+    this.database.ref("programs/" + programKey).set(program);
+    this.database
+      .ref("users/" + this.auth.currentUser.uid + "/programs/" + programKey)
+      .set(name);
+    return programKey;
   }
 
   // Database - exercises
@@ -118,8 +149,10 @@ class Firebase {
       .once("value");
   }
 
-  updateUserEvents(events){
-    this.database.ref("/users/" + this.auth.currentUser.uid + "/routine/").set(events);
+  updateUserEvents(events) {
+    this.database
+      .ref("/users/" + this.auth.currentUser.uid + "/routine/")
+      .set(events);
   }
 }
 

@@ -1,365 +1,209 @@
-import React, { Component } from 'react';
-import Exercise from '../Exercises/Exercise';
-import fire from '../../API/Fire';
-import { Link, Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import Exercise from "../Exercises/Exercise";
+import fire from "../../API/Fire";
 
-class CreateProgram extends Component {
+const CreateProgram = (props) => {
+  const [programName, setProgramName] = useState("");
+  const [programDesc, setProgramDesc] = useState("");
+  const [allExercises, setAllExercises] = useState({});
+  const [showAllExercises, setShowAllExercises] = useState(false);
+  const [activeEx, setActiveEx] = useState({});
+  const [activeMet, setActiveMet] = useState([]);
+  const [activePos, setActivePos] = useState([]);
+  const [showExDetails, setShowExDetails] = useState(false);
+  const [methodIndex, setMethodIndex] = useState();
+  const [positionIndex, setPositionIndex] = useState();
+  const [programEx, setProgramEx] = useState([]);
 
-    constructor(props) {
-        super(props)
-        this.timeout= "0";
-        this.state = {
-             program_name: '',
-             program_description: '',
-             exerciseListShow: false,
-             changeExerciseShow: "FIRST",
-             exercises: [],
-             addedExercises: [],
-             sets: [],
-             reps: [],
-             deleteExercise: null,
-             activeExerciseId: null,
-             exerciseHolder: {sets: 1, reps: 1},
-             exerciseMethods: [],
-             exercisePositions: [],
-             isChosenMethod: null,
-             isChosenPosition: null,
-             program_newKey: null,
-             redirect: false
-        }
-    }
+  const handleAddExercise = () => {
+    console.log("Handle Adding Exercise");
+    fire.getExercises().then((data) => setAllExercises(data.val()));
+    setShowAllExercises(true);
+  };
 
-    componentDidMount() {
+  const handleSelectExercise = (e, exName) => {
+    const selected =
+      allExercises[
+        Object.keys(allExercises).filter((exercise) => exercise === exName)
+      ];
+    setActiveEx(selected.name);
+    setActiveMet((activeMet) => [...activeMet, selected.methods]);
+    setActivePos((activePos) => [...activePos, selected.positions]);
+    setShowAllExercises(false);
+    setShowExDetails(true);
+  };
 
-        const getExercises = this.state.exercises;
-        let database = fire.database();
-        database.ref('exercises/').once('value').then((snap) => {
-            snap.forEach((item) => {
-                console.log(item.val().methods);
-                var temp = {name: item.val().name,
-                    id: item.val().id,
-                    methods: item.val().methods,
-                    positions: item.val().positions};
-                getExercises.push(temp);
-                this.setState({
-                    exercises: getExercises,
-                });
-                
-            });
-        });
-    }
+  const handleSelectExDetails = (e, i) => {
+    e.target.id === "method" ? setMethodIndex(i) : setPositionIndex(i);
+  };
 
-    componentDidUpdate(){
-        // USE THIS TO 
-        if(this.state.redirect){
-            console.log(this.state.program_newKey);
-            this.props.history.push('/programs/' + this.state.program_newKey);
-        }
-    }
+  const handleUpdateExercise = () => {
+    console.log("Handle Update Exercises");
+    setProgramEx((programEx) => [
+      ...programEx,
+      {
+        id: programEx.length,
+        key: programEx.length,
+        name: activeEx,
+        methods: activeMet[0][methodIndex],
+        positions: activePos[0][positionIndex],
+        sets: 0,
+        reps: 0,
+      },
+    ]);
+    setMethodIndex(null);
+    setPositionIndex(null);
+    setShowExDetails(false);
+  };
 
-    publishProgram = (e) => {
-        let database = fire.database();
-        let uid = fire.auth().currentUser.uid;
-        var newPostKey = database.ref().child('programs').push().key;
-        let newDate = Date.now();
-        database.ref('programs/' + newPostKey).set({
-            key: newPostKey,
-            name: this.state.program_name,
-            author: uid,
-            description: this.state.program_description,
-            uses: 0,
-            rating: 0,
-            reviews: 0,
-            exercises: this.state.addedExercises,
-            timestamp: newDate
-        });
-        var updates = {};
-        
-        updates['users/' + uid + '/programs/' + newPostKey] = this.state.program_name;
-        database.ref().update(updates);
-        // database.ref('users/' + fire.auth().currentUser.uid).set({
-        //     programs: newPostKey,
-            
-        // });
-        // when completed, should link to program page thats created
-        this.setState({
-            program_newKey: newPostKey,
-            redirect: true
-        })
+  const HandleSetRepChange = (e, id) => {
+    console.log(e.target.value);
+    let cpyProgramEx = [...programEx];
+    e.target.id === "sets"
+      ? (cpyProgramEx[id].sets = e.target.value)
+      : (cpyProgramEx[id].reps = e.target.value);
+    setProgramEx(cpyProgramEx);
+  };
 
-        // <Link to={'/programs/' + newPostKey}>
-    }
+  const handlePublish = async () => {
+    console.log("Handle Publish Program");
+    const pKey = await fire.publishProgram(programName, programDesc, programEx);
 
-    
-    searchUpdate = (e) => {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
-    }
+    pKey !== null
+      ? props.history.push("/programs/" + pKey)
+      : console.log("Error");
+  };
 
-    setsRepsUpdate = (e) => {
-        //need to check that e.target.value is of type integer only (ie. only numbers allowed)
-        if(e.target.getAttribute('class') === 'sets'){
-            let activeExerciseKey = e.target.getAttribute('name');
-            console.log("ACTIVE KEY IS " + activeExerciseKey);
-            let prevExercises = this.state.addedExercises;
-            prevExercises.forEach((addedExercise) => {
-                console.log(addedExercise.key);
-                if(addedExercise.key == activeExerciseKey){
-                    addedExercise.sets = e.target.value;
-                }
-                this.setState({
-                    addedExercises: prevExercises
-                });
-            });
-        } else if(e.target.getAttribute('class') === 'reps'){
-            let activeExerciseKey = e.target.getAttribute('name');
-            console.log("ACTIVE KEY IS " + activeExerciseKey);
-            let prevExercises = this.state.addedExercises;
-            prevExercises.forEach((addedExercise) => {
-                console.log(addedExercise.key);
-                if(addedExercise.key == activeExerciseKey){
-                    addedExercise.reps = e.target.value;
-                }
-                this.setState({
-                    addedExercises: prevExercises
-                });
-            });
-        }
-    }
-
-    handleButtonPress = (e) => {
-        let savedTarget = e.currentTarget;
-        this.timeout = setTimeout(() =>{
-            console.log(savedTarget.getAttribute('id'));
-            this.setState({
-                deleteExercise: savedTarget.getAttribute('id')
-            });
-            }, 800);
-        
-        
-        console.log("A TEST: "+this.state.deleteExercise);
-        
-        
-    }
-
-    handleButtonRelease = () => {
-        clearTimeout(this.timeout);
-    }
-
-    popExercise = (e) => {
-        console.log(this.state.deleteExercise);
-        let prevAddedExercises = this.state.addedExercises;
-        prevAddedExercises.splice(this.state.deleteExercise, 1);
-        this.setState({
-            addedExercises: prevAddedExercises,
-            deleteExercise: null
-        });
-    }
-
-    toggleExercises = (e) => {
-        let currentExerciseListState = this.state.exerciseListShow
-        let prevChangeExerciseShow = 2;
-        this.setState({
-            exerciseListShow: !currentExerciseListState,
-            changeExerciseShow: prevChangeExerciseShow
-        });
-    }
-
-    exerciseFlags = (e) => {
-        let id = this.state.activeExerciseId;
-        console.log(e.target);
-        if(e.target.getAttribute('id')){
-            id = e.target.getAttribute('id');
-            console.log("ID IS: " + id);
-        }
-        let currentExerciseHolder = this.state.exerciseHolder;
-        let currentExerciseMethods = this.state.exerciseMethods;
-        let currentExercisePositions = this.state.exercisePositions;
-        let currentExerciseListLength = this.state.addedExercises.length;
-        console.log("LENGTH IS "+ currentExerciseListLength);
-        
-        let prevAddedExercises = this.state.addedExercises;
-        if(e.target.getAttribute('id')){
-            currentExerciseHolder.key = currentExerciseListLength;
-            currentExerciseHolder.id = e.target.getAttribute('id');
-            currentExerciseHolder.name = e.target.getAttribute('exercise');
-            currentExerciseMethods = e.target.getAttribute('methods');
-            let methodsArray = currentExerciseMethods.split(',')
-            currentExercisePositions = e.target.getAttribute('positions');
-            let positionsArray = currentExercisePositions.split(',')
-            console.log(currentExerciseMethods);
-            this.setState({
-                // addedExercises: prevAddedExercises
-                exerciseHolder: currentExerciseHolder,
-                exerciseMethods: methodsArray,
-                exercisePositions: positionsArray,
-            });
-        }
-
-        let prevChangeExerciseShow = 3;
-        this.setState({
-            changeExerciseShow: prevChangeExerciseShow,
-            activeExerciseId: id
-        })
-    }
-
-    defaultScreen = (e) => {
-        
-        let currentExerciseHolder = this.state.exerciseHolder;
-        let prevAddedExercises = this.state.addedExercises;
-
-        if(e.target.getAttribute('id')){
-            currentExerciseHolder.methods = this.state.isChosenMethod
-            currentExerciseHolder.positions = this.state.isChosenPosition
-            prevAddedExercises.push(currentExerciseHolder);
-            this.setState({
-                addedExercises: prevAddedExercises
-            });
-        }
-        let currentExerciseListState = this.state.exerciseListShow;
-        let prevChangeExerciseShow = 1;
-        this.setState({
-            exerciseListShow: !currentExerciseListState,
-            changeExerciseShow: prevChangeExerciseShow,
-            exerciseHolder: {sets: 1, reps: 1},
-            isChosenMethod: null,
-            isChosenPosition: null
-        });
-        console.log(prevAddedExercises);
-    }
-
-    setChosenMethod = (e) => {
-        console.log(e.target.getAttribute('id'));
-        this.setState({
-            isChosenMethod: e.target.getAttribute('id')
-        })
-    }
-
-    setChosenPosition = (e) => {
-        console.log(e.target.getAttribute('id'));
-        this.setState({
-            isChosenPosition: e.target.getAttribute('id')
-        })
-    }
-
-    render() {
-        const { exerciseListShow, exercises, addedExercises, deleteExercise, activeExerciseId, exerciseHolder, exerciseMethods, exercisePositions, isChosenMethod, isChosenPosition } = this.state;
-        // console.log(this.props);
-        
-        return (
-            <div className='createprogram-background'>
-                <div className='createprogram-container'>
-                    <div className='createprogram-heading'>
-                        <input type='text' placeholder='Enter Program name' value={this.state.program_name} onChange={this.searchUpdate} name='program_name'/>
-                        
-                    </div>
-                    <div className='createprogram-description'>
-                        <input type='text' placeholder='Enter Program description...' value={this.state.program_description} onChange={this.searchUpdate} name='program_description'/>
-                    </div>
-                    <div className='createprogram-type'>
-                        STRENGTH
-                    </div>
-                    <div className='createprogram-exercises'>
-                        <div className='createprogram-table'>
-                            <div className='cp-tableheader'>
-                                <div className='cp-tableheader-exercise'>Exercises</div>
-                                <div className='cp-tableheader-sets'>Reps</div>
-                                <div className='cp-tableheader-reps'>Sets</div>
-                            </div>
-                            <div className='cp-tablebody'>
-                                <button name='showExercises' onClick={this.toggleExercises}>Add</button>
-                                
-                                {(()=>{
-                                    
-                                    switch(this.state.changeExerciseShow) {
-                                        case 1:
-                                            return(addedExercises.map((addedExercise) => {
-                                                return(
-                                                    <div key={addedExercise.key} id={addedExercise.key} onMouseDown={this.handleButtonPress} onMouseUp={this.handleButtonRelease}>
-                                                        <div className='cp-tablebody-exercise'>{addedExercise.name}<br/>M: {addedExercise.methods}, P: {addedExercise.positions}</div>
-                                                        <div className='cp-tablebody-sets'>
-                                                            <input value={addedExercise.sets} onChange={this.setsRepsUpdate} name={addedExercise.key} className='sets'/>
-                                                        </div>
-                                                        <div className='cp-tablebody-reps'>
-                                                            <input value={addedExercise.reps} onChange={this.setsRepsUpdate} name={addedExercise.key} className='reps'/>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }));
-                                        case 2:
-                                            return(<div className='showExercisesContainer'>
-                                            <div className='showExercisesContainer-recyclerview'>
-                                            {
-                                                exercises.map((exercise) => {
-                                                    return(
-                                                        // <div key={exercise.id} onClick={this.toggleExercises}>
-                                                        <div key={exercise.id} onClick={this.exerciseFlags}>
-                                                            <Exercise exerciseName={exercise.name} exerciseId={exercise.id} key={exercise.id} exerciseMethods={exercise.methods} exercisePositions={exercise.positions} createProgram={exerciseListShow} />
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                            </div> ;
-                                        </div>);
-                                        case 3:
-                                            return(
-                                            <div className='showExercisesFlagsContainer'>
-                                                <div className='showExercisesFlagsContainer-recyclerview'>
-                                                    <h2 className='fc-heading'>{exerciseHolder.name}</h2>
-                                                    <h4>Method:</h4>
-                                                    <div className='fc-exercise-methods'>
-                                                        
-                                                    {
-                                                       
-                                                        exerciseMethods.map((method) => {
-                                                            return(
-                                                                <div key={method} id={method} className={isChosenMethod == method ? 'fc-method-container active' : 'fc-method-container'} onClick={this.setChosenMethod}>
-                                                                {method}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
-                                                        
-                                                    </div>
-                                                    <h4>Position:</h4>
-                                                    <div className='fc-exercise-methods'>
-                                                        
-                                                    {
-                                                       
-                                                        exercisePositions.map((position) => {
-                                                            return(
-                                                                <div key={position} id={position} className={isChosenPosition == position ? 'fc-method-container active' : 'fc-method-container'} onClick={this.setChosenPosition}>
-                                                                {position}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
-                                                        
-                                                    </div>
-                                                    <button id={activeExerciseId} onClick={this.defaultScreen}>Add</button>
-                                                </div>
-                                            </div>);
-                                    }
-                                }
-                                )()}
-                            </div>
-                        </div>
-                        
-                        <button onClick={this.publishProgram}>Publish</button>
-                    </div>
-                </div>
-                { deleteExercise ? 
-                    <div className='deleteExercise-container' id={deleteExercise}>
-                        <button onClick={this.popExercise}>Delete this exercise</button>
-                        <button onClick={()=>{this.setState({deleteExercise: null});}}>Cancel</button>
-                    </div>        
-                    :
-                    <div></div>
-                }
+  return (
+    <div className="createprogram-background">
+      {console.log(programEx)}
+      <div className="createprogram-container">
+        <div className="createprogram-heading">
+          <input
+            type="text"
+            placeholder="Enter Program name"
+            value={programName}
+            onChange={(e) => setProgramName(e.target.value)}
+            name="program_name"
+          />
+        </div>
+        <div className="createprogram-description">
+          <input
+            type="text"
+            placeholder="Enter Program description..."
+            value={programDesc}
+            onChange={(e) => setProgramDesc(e.target.value)}
+            name="program_description"
+          />
+        </div>
+        <div className="createprogram-type">STRENGTH</div>
+        <div className="createprogram-exercises">
+          <div className="createprogram-table">
+            <div className="cp-tableheader">
+              <div className="cp-tableheader-exercise">Exercises</div>
+              <div className="cp-tableheader-reps">Sets</div>
+              <div className="cp-tableheader-sets">Reps</div>
             </div>
-        )
-    }
-}
+            <div className="cp-tablebody">
+              <button name="showExercises" onClick={() => handleAddExercise()}>
+                Add
+              </button>
 
-export default CreateProgram
+              {programEx.map((exercise) => {
+                // need delete button for exercises
+                return (
+                  <div key={exercise.key} id={exercise.key}>
+                    <div className="cp-tablebody-exercise">
+                      {exercise.name}
+                      <br />
+                      M: {exercise.methods}, P: {exercise.positions}
+                    </div>
+                    <div className="cp-tablebody-sets">
+                      <input
+                        value={exercise.sets}
+                        onChange={(e) => HandleSetRepChange(e, exercise.id)}
+                        name={exercise.key}
+                        className="sets"
+                        id="sets"
+                      />
+                    </div>
+                    <div className="cp-tablebody-reps">
+                      <input
+                        value={exercise.reps}
+                        onChange={(e) => HandleSetRepChange(e, exercise.id)}
+                        name={exercise.key}
+                        className="reps"
+                        id="reps"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              {showAllExercises &&
+                Object.keys(allExercises).map((exName) => {
+                  return (
+                    <button
+                      className="cp-tablebody-exercise"
+                      key={allExercises[exName].id}
+                      onClick={(e) => handleSelectExercise(e, exName)}
+                    >
+                      {allExercises[exName].name}
+                    </button>
+                  );
+                })}
+              {showExDetails && (
+                <div className="showExercisesFlagsContainer">
+                  <div className="showExercisesFlagsContainer-recyclerview">
+                    <h2 className="fc-heading">{activeEx}</h2>
+                    <h4>Method:</h4>
+                    <div className="fc-exercise-methods">
+                      {activeMet[0].map((method, i) => {
+                        return (
+                          <button
+                            id="method"
+                            className={
+                              methodIndex === i
+                                ? "fc-method-container active"
+                                : "fc-method-container"
+                            }
+                            key={i}
+                            onClick={(e) => handleSelectExDetails(e, i)}
+                          >
+                            {method}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <h4>Positions:</h4>
+                    <div className="fc-exercise-methods">
+                      {activePos[0].map((position, i) => {
+                        return (
+                          <button
+                            id="position"
+                            className={
+                              positionIndex === i
+                                ? "fc-method-container active"
+                                : "fc-method-container"
+                            }
+                            key={i}
+                            onClick={(e) => handleSelectExDetails(e, i)}
+                          >
+                            {position}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <button onClick={() => handleUpdateExercise()}>Add</button>
+                </div>
+              )}
+            </div>
+          </div>
+          <button onClick={() => handlePublish()}>Publish</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateProgram;

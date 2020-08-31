@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
 import Navigation from "../Navigation/Navigation";
 import Programs from "../Programs/Programs";
 import ProgramContainer from "../ProgramContainer/ProgramContainer";
-import Start, { StartProgram } from "../StartProgram/StartProgram";
+import StartProgram from "../StartProgram/StartProgram";
 import Exercises from "../Exercises/Exercises";
 import ExerciseContainer from "../ExerciseContainer/ExerciseContainer";
 import Routine from "../Routine/Routine";
