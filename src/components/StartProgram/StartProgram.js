@@ -300,6 +300,7 @@ import fire from "../../API/Fire";
 //                 </button>
 //               </div>
 //             </div>
+
 //             {startProgram_exercises.map((SPexercise, index1) => {
 //               return (
 //                 <div
@@ -423,6 +424,7 @@ const StartProgram = (props) => {
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [percentage, setPercentage] = useState(0);
+  const [completeProgram, setCompleteProgram] = useState(false);
 
   useEffect(() => {
     fire
@@ -431,7 +433,7 @@ const StartProgram = (props) => {
 
     let interval = null;
     if (timerActive) {
-      interval.setInterval(() => setSeconds(seconds + 1), 1000);
+      interval = setInterval(() => setSeconds(seconds + 1), 1000);
       if (seconds === 60) {
         setSeconds(0);
         setMinutes(minutes + 1);
@@ -441,9 +443,13 @@ const StartProgram = (props) => {
     return () => clearInterval(interval);
   }, [timerActive, seconds]);
 
+  const handleCompleteSet = () => {
+    console.log("Handle Complete Set");
+  };
+
   const handleCompleteProgram = () => {
-      console.log("Handle Complete Program")
-  }
+    console.log("Handle Complete Program");
+  };
 
   return (
     <div className="programContainer-background">
@@ -499,12 +505,92 @@ const StartProgram = (props) => {
                 Done
               </button>
             </div>
-            {program.exercises.map((exercise) => {
+            {program.exercises.map((exercise, index) => {
               return (
-                <div>
-                  <div>{exercise.name}</div>
-                  <div>{exercise.sets}</div>
-                  <div>{exercise.reps}</div>
+                <div className="sp-overlay">
+                  <div className="SP-exercise-headings">
+                    <h1>{exercise.name}</h1>
+                    <h5>{exercise.methods}</h5>
+                    <h5>{exercise.positions}</h5>
+                  </div>
+                  <div id="SP-sets" className="SP-row-container">
+                    <h4 className="SP-exercise-sets"></h4>
+                    {Array.from(
+                      Array(Number.parseInt(exercise.sets)),
+                      (e, i) => {
+                        return (
+                          <h4 key={i} id={i} className="SP-exercise-sets">
+                            Set {i + 1}
+                          </h4>
+                        );
+                      }
+                    )}
+                  </div>
+                  <div id="SP-sets" className="SP-row-container">
+                    <h4 className="SP-exercise-sets">Reps</h4>
+                    {Array.from(
+                      Array(Number.parseInt(exercise.sets)),
+                      (e, i) => {
+                        return (
+                          <h4 key={i} id={i} className="SP-exercise-sets">
+                            {exercise.reps}
+                          </h4>
+                        );
+                      }
+                    )}
+                  </div>
+                  <div id="SP-sets" className="SP-row-container">
+                    <h4 className="SP-exercise-sets">Weight</h4>
+                    {Array.from(
+                      Array(Number.parseInt(exercise.sets)),
+                      (e, i) => {
+                        return (
+                          <h4 key={i} id={i} className="SP-exercise-sets">
+                            0
+                          </h4>
+                        );
+                      }
+                    )}
+                  </div>
+                  <div id="SP-sets" className="SP-row-container">
+                    <h4 className="SP-exercise-sets">Status</h4>
+                    {Array.from(
+                      Array(Number.parseInt(exercise.sets)),
+                      (e, i) => {
+                        return (
+                          <h4 key={i} id={i} className="SP-exercise-sets">
+                            <button
+                              className="complete-set-button"
+                              id={"sp-status-" + index + "-" + i}
+                              onClick={() => handleCompleteSet()}
+                            >
+                              <i
+                                className="material-icons"
+                                id={"sp-status-" + index + "-" + i}
+                              >
+                                play_arrow
+                              </i>
+                            </button>
+                          </h4>
+                        );
+                      }
+                    )}
+                    {/* {completeProgram ? (
+                      <div>Complete!</div>
+                    ) : (
+                      <div id="SP-sets" className="SP-row-container">
+                        <div className="weight-scale">
+                          <input
+                            className="weight-scale-input"
+                            placeholder="Enter Weight [KG]"
+                            onChange={() => console.log("Something")}
+                            name="weightInput"
+                            id={index}
+                          />
+                        </div>
+                      </div>
+                    )} */}
+                  </div>
                 </div>
               );
             })}
