@@ -131,6 +131,16 @@ class Firebase {
     return programKey;
   }
 
+  completeProgram(pKey, start, end) {
+    return this.database
+      .ref("users/" + this.auth.currentUser.uid + "/routine/" + pKey)
+      .update({
+        isdone: true,
+        start: start,
+        end: end,
+      });
+  }
+
   // Database - exercises
 
   getExercises() {

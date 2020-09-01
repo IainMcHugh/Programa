@@ -15,17 +15,18 @@ const StartProgram = (props) => {
   const [fraction, setFraction] = useState(0);
   const [total, setTotal] = useState(0);
   const [percentage, setPercentage] = useState(0);
+  const [startTime, setStartTime] = useState("");
   const [completeProgram, setCompleteProgram] = useState(false);
 
   useEffect(() => {
+    setStartTime(new Date().toISOString());
+    console.log(props.match);
     let counter = 0;
-    fire
-      .getProgram(props.match.params.id)
-      .then((data) => {
-        setProgram(data.val());
-        data.val().exercises.map(e => counter += Number.parseInt(e.sets));
-        setTotal(counter);
-      });
+    fire.getProgram(props.match.params.id).then((data) => {
+      setProgram(data.val());
+      data.val().exercises.map((e) => (counter += Number.parseInt(e.sets)));
+      setTotal(counter);
+    });
 
     let interval = null;
     if (timerActive) {
@@ -52,36 +53,18 @@ const StartProgram = (props) => {
       setCurrSet(currSet + 1);
     }
     setFraction(fraction + 1);
-    setPercentage((((fraction + 1)/total)*100).toFixed(0));
+    setPercentage((((fraction + 1) / total) * 100).toFixed(0));
     console.log(percentage);
   };
 
   const handleCompleteProgram = (e) => {
-    // update firebase with status: true
-    // navigate back to Routine
-
-    //   doneProgram = (e) => {
-//     // Use program key to update firebase database
-//     let database = fire.database();
-//     let uid = fire.auth().currentUser.uid;
-//     // var newPostKey = database.ref().child('programs').push().key;
-//     let newStartTime = this.state.startTime;
-//     let newEndTime = new Date().toISOString();
-//     console.log(newEndTime);
-//     this.setState({
-//       endTime: newEndTime,
-//     });
-//     database
-//       .ref("users/" + uid + "/routine/" + this.state.program_key + "/")
-//       .update({
-//         isdone: true,
-//         start: newStartTime,
-//         end: newEndTime,
-//       });
-//     alert("Program Complete!");
-//     // at end - navigate back to routine page
-//     this.props.history.push("/routine");
-//   };
+    let endTime = new Date().toISOString();
+    fire
+      .completeProgram(props.match.params.eventkey, startTime, endTime)
+      .then((res) => {
+        console.log(`Response: ${res}`);
+        props.history.push("/routine");
+      });
   };
 
   return (
