@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import fire from "../../API/Fire";
 import logo from "../../images/program-fitness.png";
 
-const Login = (props) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+interface Props {
+  toggle: () => void;
+}
+
+const Login: React.FC<Props> = (props) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const handleLogin = () => {
     if (!email || !password) return setError("Fields are empty");

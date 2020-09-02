@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import fire from "../../API/Fire";
 
-const ExerciseContainer = (props) => {
-  const [exercise, setExercise] = useState("");
-  const [id, setId] = useState();
+interface Props {
+  match: {params: {name: string}}
+}
+
+const ExerciseContainer: React.FC<Props> = (props) => {
+  const [exercise, setExercise] = useState<any>("");
+  const [id, setId] = useState<number>();
 
   useEffect(() => {
     let name = props.match.params.name.toLowerCase().replace(/\s+/g, "_");

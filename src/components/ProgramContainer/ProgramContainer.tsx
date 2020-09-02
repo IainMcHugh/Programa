@@ -1,15 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import { Link } from "react-router-dom";
-import {RRules} from "../RRules/RRules";
+import { RRules } from "../RRules/RRules";
 import fire from "../../API/Fire";
 
-const ProgramContainer = (props) => {
-  const [program, setProgram] = useState();
-  const [navExerciseName, setNavExerciseName] = useState("");
-  const [navExerciseId, setNavExerciseId] = useState("");
-  const [createEvent, setCreateEvent] = useState(false);
-  const [usersProgram, setUsersProgram] = useState(false);
-  const [savedProgram, setSavedProgram] = useState(false);
+interface Props {
+  match: { params: { id: string } };
+}
+
+interface Event {
+  key: number;
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  desc: string;
+  isrepeat: boolean;
+  isdone: boolean;
+  repeat_start?: number;
+  repeat_end?: number;
+}
+
+interface Exercise {
+  id: string;
+  key: number;
+  name: string;
+  methods: string;
+  positions: string;
+  sets: number;
+  reps: number;
+}
+
+const ProgramContainer: React.FC<Props> = (props) => {
+  const [program, setProgram] = useState<any>();
+  const [navExerciseName, setNavExerciseName] = useState<string>("");
+  const [navExerciseId, setNavExerciseId] = useState<string | null>("");
+  const [createEvent, setCreateEvent] = useState<boolean>(false);
+  const [usersProgram, setUsersProgram] = useState<boolean>(false);
+  const [savedProgram, setSavedProgram] = useState<boolean>(false);
 
   useEffect(() => {
     fire.getProgram(props.match.params.id).then((data) => {
@@ -27,8 +54,8 @@ const ProgramContainer = (props) => {
     });
   }, []);
 
-  const handleButtonPress = (e) => {
-    const { id, title } = e.target;
+  const handleButtonPress = (e: React.MouseEvent<HTMLElement>) => {
+    const { id, title } = e.target as HTMLElement;
     setNavExerciseId(id);
     setNavExerciseName(title);
   };
@@ -37,23 +64,23 @@ const ProgramContainer = (props) => {
     setNavExerciseId(null);
   };
 
-  const handleCreateEvent = (e) => {
+  const handleCreateEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const repeatValue = e.target.elements.repeat.value;
-    const start = new Date(e.target.elements.beginentry.value);
-    const end = new Date(e.target.elements.endentry.value);
+    const repeatValue = (e.currentTarget.elements.namedItem("repeat") as HTMLInputElement).value;
+    const start = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
+    const end = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
 
     fire.getUserRoutines().then((data) => {
-      let dataLength = data.numChildren();
-      let updates = {};
+      let dataLength: number = data.numChildren();
+      let updates: any = {};
       if (repeatValue === "yesrepeat") {
-        let updates = {};
+        // let updates = {};
 
-        const startCollection = RRules(start, 10);
-        const endCollection = RRules(end, 10);
+        const startCollection: Date[] = RRules(start, 10);
+        const endCollection: Date[] = RRules(end, 10);
 
         startCollection.forEach((start, index) => {
-          let newEvent = {
+          let newEvent: Event = {
             key: index + dataLength,
             id: props.match.params.id,
             title: program.name,
@@ -69,15 +96,15 @@ const ProgramContainer = (props) => {
         });
         fire.createEvents(updates);
         alert("Repeat Events added to your Calendar!");
-      } 
-      
+      }
+
       else {
         console.log("Not a Repeat Event");
 
         const startCollection = RRules(start, 1);
         const endCollection = RRules(end, 1);
 
-        let newEvent = {
+        let newEvent: Event = {
           key: dataLength,
           id: props.match.params.id,
           title: program.name,
@@ -88,8 +115,6 @@ const ProgramContainer = (props) => {
           isdone: false,
         };
         updates[`${dataLength}/`] = newEvent;
-        console.log("Updates Object:");
-        console.log(updates);
         fire.createEvents(updates);
 
         alert("Event added to your Calendar!");
@@ -100,7 +125,7 @@ const ProgramContainer = (props) => {
 
   const handleSaveProgram = () => {
     console.log("Handle Save Program");
-    let updates = {};
+    let updates: any = {};
     updates[props.match.params.id] = program.name;
     fire.saveProgram(updates);
     setSavedProgram(true);
@@ -123,7 +148,7 @@ const ProgramContainer = (props) => {
             <h4 className="programContainer-exercise-heading">Sets</h4>
             <h4 className="programContainer-exercise-heading">Reps</h4>
           </div>
-          {program.exercises.map((exercise) => {
+          {program.exercises.map((exercise: Exercise) => {
             return (
               <div
                 key={exercise.key}
@@ -217,12 +242,12 @@ const ProgramContainer = (props) => {
             </button>
           </div>
         ) : (
-          <div>
-            <button onClick={() => handleRemoveProgram()}>
-              Remove this Program from your Saved Programs
+            <div>
+              <button onClick={() => handleRemoveProgram()}>
+                Remove this Program from your Saved Programs
             </button>
-          </div>
-        ))}
+            </div>
+          ))}
       <button onClick={() => setCreateEvent(true)}>Add to your Calendar</button>
     </div>
   );

@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 
-const Auth = () => {
-    const [loginRegister, toggleLoginRegister] = useState(false);
-    
+const Auth: React.FC = () => {
+    const [loginRegister, toggleLoginRegister] = useState<boolean>(false);
+
     return (
         <div>
-            {loginRegister ? 
-            <Register toggle={()=>toggleLoginRegister(false)}/> : 
-            <Login toggle={()=>toggleLoginRegister(true)}/>
+            {loginRegister ?
+                <Register toggle={() => toggleLoginRegister(false)} /> :
+                <Login toggle={() => toggleLoginRegister(true)} />
             }
             <div className="login-background-text">
                 Programs <br />

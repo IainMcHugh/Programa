@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
-import defaultProfile from "../../images/profileLogo.png";
-import { Link } from "react-router-dom";
 import fire from "../../API/Fire";
+import { Link } from "react-router-dom";
+import defaultProfile from "../../images/profileLogo.png";
 
-const Profile = () => {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [routine, setRoutine] = useState([]);
-  const [programs, setPrograms] = useState({});
-  const [savedPrograms, setSavedPrograms] = useState({});
+interface Programs {
+  username: string;
+  email: string;
+  programs: { [key: string]: string; };
+  routine: {};
+}
+
+const Profile: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [programs, setPrograms] = useState<any>({});
+  const [savedPrograms, setSavedPrograms] = useState<any>({});
 
   useEffect(() => {
     // get username + email

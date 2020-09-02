@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import fire from "../../API/Fire";
 import { Link } from "react-router-dom";
+import fire from "../../API/Fire";
 
 const Programs = () => {
-  const [search, setSearch] = useState("");
-  const [recents, setRecents] = useState({});
-  const [trending, setTrending] = useState({});
+  const [search, setSearch] = useState<string>("");
+  const [recents, setRecents] = useState<any>({});
+  const [trending, setTrending] = useState<any>({});
 
   useEffect(() => {
     // Recently Added
@@ -30,7 +30,7 @@ const Programs = () => {
         <h4>Trending</h4>
         <div className="programs-horizontal-container">
         {trending &&
-            Object.keys(trending).map((program) => {
+            Object.keys(trending).map((program: string) => {
               return (
                 <Link
                   className="program-container-link"
@@ -47,7 +47,7 @@ const Programs = () => {
         <h4>Recently Added</h4>
         <div className="programs-horizontal-container">
           {recents &&
-            Object.keys(recents).map((program) => {
+            Object.keys(recents).map((program: string) => {
               return (
                 <Link
                   className="program-container-link"

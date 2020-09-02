@@ -1,6 +1,6 @@
 import { RRule, RRuleSet, rrulestr } from "rrule";
 
-const RRules = (rrdate, rrcount) => {
+const RRules = (rrdate: Date, rrcount: number) => {
     return new RRule({
         freq: RRule.WEEKLY,
         interval: 1,

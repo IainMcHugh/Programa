@@ -3,14 +3,14 @@ import Exercise from "./Exercise";
 import fire from "../../API/Fire";
 
 const Exercises = () => {
-  const [search, setSearch] = useState("");
-  const [exercises, setExercises] = useState({});
+  const [search, setSearch] = useState<string>();
+  const [exercises, setExercises] = useState<any>({});
 
   useEffect(()=> {
     fire.getExercises().then(data => setExercises(data.val()));
   },[])
 
-  const searchHandler = (e) => {
+  const searchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   }
 
@@ -26,7 +26,7 @@ const Exercises = () => {
         />
       </div>
       <div className="exercises-recyclerview">
-        {exercises && Object.keys(exercises).map((exercise) => {
+        {exercises && Object.keys(exercises).map((exercise: string) => {
           return (
             <Exercise
               exerciseName={exercises[exercise].name}

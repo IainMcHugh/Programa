@@ -1,19 +1,43 @@
 import React, { useState, useEffect } from "react";
-import Exercise from "../Exercises/Exercise";
+import { History } from 'history';
+// import Exercise from "../Exercises/Exercise";
 import fire from "../../API/Fire";
 
-const CreateProgram = (props) => {
-  const [programName, setProgramName] = useState("");
-  const [programDesc, setProgramDesc] = useState("");
-  const [allExercises, setAllExercises] = useState({});
-  const [showAllExercises, setShowAllExercises] = useState(false);
-  const [activeEx, setActiveEx] = useState({});
-  const [activeMet, setActiveMet] = useState([]);
-  const [activePos, setActivePos] = useState([]);
-  const [showExDetails, setShowExDetails] = useState(false);
-  const [methodIndex, setMethodIndex] = useState();
-  const [positionIndex, setPositionIndex] = useState();
-  const [programEx, setProgramEx] = useState([]);
+interface Props {
+  history: History;
+}
+
+interface SelectedExercise {
+  name: string;
+  description: string;
+  id: string;
+  type: string;
+  methods: [];
+  positions: string;
+}
+
+interface ProgramExercise {
+  id: string;
+  key: string;
+  name: string;
+  methods: string;
+  positions: string;
+  sets: number;
+  reps: number;
+}
+
+const CreateProgram: React.FC<Props> = (props) => {
+  const [programName, setProgramName] = useState<string>("");
+  const [programDesc, setProgramDesc] = useState<string>("");
+  const [allExercises, setAllExercises] = useState<any>({});
+  const [showAllExercises, setShowAllExercises] = useState<boolean>(false);
+  const [activeEx, setActiveEx] = useState<any>({});
+  const [activeMet, setActiveMet] = useState<any>([]);
+  const [activePos, setActivePos] = useState<any>([]);
+  const [showExDetails, setShowExDetails] = useState<boolean>(false);
+  const [methodIndex, setMethodIndex] = useState<number>(0);
+  const [positionIndex, setPositionIndex] = useState<number>(0);
+  const [programEx, setProgramEx] = useState<any>([]);
 
   const handleAddExercise = () => {
     console.log("Handle Adding Exercise");
@@ -21,25 +45,26 @@ const CreateProgram = (props) => {
     setShowAllExercises(true);
   };
 
-  const handleSelectExercise = (e, exName) => {
-    const selected =
-      allExercises[
-        Object.keys(allExercises).filter((exercise) => exercise === exName)
-      ];
+  const handleSelectExercise = (exName: string) => {
+    // const selected: any =
+    //   allExercises[
+    //     Object.keys(allExercises).filter((exercise: any) => exercise === exName)
+    //   ];
+    const selected: SelectedExercise = allExercises[exName];
     setActiveEx(selected.name);
-    setActiveMet((activeMet) => [...activeMet, selected.methods]);
-    setActivePos((activePos) => [...activePos, selected.positions]);
+    setActiveMet((activeMet: []) => [...activeMet, selected.methods]);
+    setActivePos((activePos: []) => [...activePos, selected.positions]);
     setShowAllExercises(false);
     setShowExDetails(true);
   };
 
-  const handleSelectExDetails = (e, i) => {
-    e.target.id === "method" ? setMethodIndex(i) : setPositionIndex(i);
+  const handleSelectExDetails = (e: React.MouseEvent<HTMLElement>, i: number) => {
+    (e.target as HTMLElement).id === "method" ? setMethodIndex(i) : setPositionIndex(i);
   };
 
   const handleUpdateExercise = () => {
     console.log("Handle Update Exercises");
-    setProgramEx((programEx) => [
+    setProgramEx((programEx: []) => [
       ...programEx,
       {
         id: programEx.length,
@@ -51,17 +76,16 @@ const CreateProgram = (props) => {
         reps: 0,
       },
     ]);
-    setMethodIndex(null);
-    setPositionIndex(null);
+    setMethodIndex(0);
+    setPositionIndex(0);
     setShowExDetails(false);
   };
 
-  const HandleSetRepChange = (e, id) => {
-    console.log(e.target.value);
+  const HandleSetRepChange = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
     let cpyProgramEx = [...programEx];
-    e.target.id === "sets"
-      ? (cpyProgramEx[id].sets = e.target.value)
-      : (cpyProgramEx[id].reps = e.target.value);
+    (e.target as HTMLElement).id === "sets"
+      ? (cpyProgramEx[Number.parseInt(id)].sets = (e.target as HTMLInputElement).value)
+      : (cpyProgramEx[Number.parseInt(id)].reps = (e.target as HTMLInputElement).value);
     setProgramEx(cpyProgramEx);
   };
 
@@ -69,9 +93,11 @@ const CreateProgram = (props) => {
     console.log("Handle Publish Program");
     const pKey = await fire.publishProgram(programName, programDesc, programEx);
 
-    pKey !== null
-      ? props.history.push("/programs/" + pKey)
-      : console.log("Error");
+    if(pKey === null) return null;
+    props.history.push("/programs/" + pKey);
+    // pKey !== null
+    //   ? props.history.push("/programs/" + pKey)
+    //   : console.log("Error");
   };
 
   return (
@@ -109,7 +135,7 @@ const CreateProgram = (props) => {
                 Add
               </button>
 
-              {programEx.map((exercise) => {
+              {programEx.map((exercise: ProgramExercise) => {
                 // need delete button for exercises
                 return (
                   <div key={exercise.key} id={exercise.key}>
@@ -145,7 +171,7 @@ const CreateProgram = (props) => {
                     <button
                       className="cp-tablebody-exercise"
                       key={allExercises[exName].id}
-                      onClick={(e) => handleSelectExercise(e, exName)}
+                      onClick={() => handleSelectExercise(exName)}
                     >
                       {allExercises[exName].name}
                     </button>
@@ -157,7 +183,7 @@ const CreateProgram = (props) => {
                     <h2 className="fc-heading">{activeEx}</h2>
                     <h4>Method:</h4>
                     <div className="fc-exercise-methods">
-                      {activeMet[0].map((method, i) => {
+                      {activeMet[0].map((method: string, i: number) => {
                         return (
                           <button
                             id="method"
@@ -176,7 +202,7 @@ const CreateProgram = (props) => {
                     </div>
                     <h4>Positions:</h4>
                     <div className="fc-exercise-methods">
-                      {activePos[0].map((position, i) => {
+                      {activePos[0].map((position: string, i: number) => {
                         return (
                           <button
                             id="position"

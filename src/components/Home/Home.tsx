@@ -11,7 +11,7 @@ import Profile from "../Profile/Profile";
 import CreateProgram from "../CreateProgram/CreateProgram";
 import EditProfile from "../Profile/EditProfile";
 
-const Home = () => (
+const Home: React.FC = () => (
   <Router>
     <div className="router">
       <Navigation />

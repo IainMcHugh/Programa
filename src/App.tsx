@@ -5,7 +5,7 @@ import Home from "./components/Home/Home";
 
 import "./App.css";
 
-const App = () => {
+const App: React.FC = () => {
   const [user, setUser] = useState();
 
   useEffect(() => {

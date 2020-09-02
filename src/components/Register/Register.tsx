@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import fire from "../../API/Fire";
 import logo from "../../images/program-fitness.png";
 
-const Register = (props) => {
-  const [email, setEmail] = useState("");
-  const [userHandle, setUserHandle] = useState("");
-  const [password, setPassword] = useState("");
-  const [repwd, setRepwd] = useState("");
-  const [error, setError] = useState("");
+interface Props {
+  toggle: () => void;
+}
+
+const Register: React.FC<Props> = (props) => {
+  const [email, setEmail] = useState<string>("");
+  const [userHandle, setUserHandle] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [repwd, setRepwd] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const handleRegister = () => {
     if (!email || !userHandle || !password || !repwd) {
