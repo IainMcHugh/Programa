@@ -70,7 +70,8 @@ const ProgramContainer: React.FC<Props> = (props) => {
     const start = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
     const end = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
 
-    fire.getUserRoutines().then((data) => {
+    fire.getUserRoutines()
+    .then((data) => {
       let dataLength: number = data.numChildren();
       let updates: any = {};
       if (repeatValue === "yesrepeat") {
@@ -120,7 +121,8 @@ const ProgramContainer: React.FC<Props> = (props) => {
         alert("Event added to your Calendar!");
       }
       setCreateEvent(false);
-    });
+    })
+    .catch((err) => console.log(err));
   };
 
   const handleSaveProgram = () => {

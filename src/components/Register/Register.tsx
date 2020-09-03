@@ -22,7 +22,7 @@ const Register: React.FC<Props> = (props) => {
       fire
         .register(email, password)
         .then((newUser) => {
-          fire.addNewUser(newUser.user, email, userHandle);
+          if(newUser) fire.addNewUser(newUser.user, email, userHandle);
         })
         .catch((err) => {
           console.log(err);

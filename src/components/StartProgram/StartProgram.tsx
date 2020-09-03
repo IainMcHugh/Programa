@@ -1,22 +1,40 @@
 import React, { useState, useEffect, Children } from "react";
+import { History } from "history";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { Link } from "react-router-dom";
 import fire from "../../API/Fire";
 
-const StartProgram = (props) => {
-  const [start, setStart] = useState(false);
-  const [program, setProgram] = useState({});
-  const [timerActive, setTimerActive] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [currSet, setCurrSet] = useState(0);
-  const [currEx, setCurrEx] = useState(0);
-  const [fraction, setFraction] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [percentage, setPercentage] = useState(0);
-  const [startTime, setStartTime] = useState("");
-  const [completeProgram, setCompleteProgram] = useState(false);
+interface Props {
+  match: {
+    params: { id: string; eventkey: string; }
+  };
+  history: History;
+}
+
+interface Exercises {
+  key: number;
+  id: string;
+  name: string;
+  methods: string;
+  positions: string;
+  sets: string;
+  reps: string;
+}
+
+const StartProgram: React.FC<Props> = (props) => {
+  const [start, setStart] = useState<boolean>(false);
+  const [program, setProgram] = useState<any>({});
+  const [timerActive, setTimerActive] = useState<boolean>(false);
+  const [seconds, setSeconds] = useState<number>(0);
+  const [minutes, setMinutes] = useState<number>(0);
+  const [currSet, setCurrSet] = useState<number>(0);
+  const [currEx, setCurrEx] = useState<number>(0);
+  const [fraction, setFraction] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+  const [percentage, setPercentage] = useState<number>(0);
+  const [startTime, setStartTime] = useState<string>("");
+  const [completeProgram, setCompleteProgram] = useState<boolean>(false);
 
   useEffect(() => {
     setStartTime(new Date().toISOString());
@@ -24,47 +42,44 @@ const StartProgram = (props) => {
     let counter = 0;
     fire.getProgram(props.match.params.id).then((data) => {
       setProgram(data.val());
-      data.val().exercises.map((e) => (counter += Number.parseInt(e.sets)));
+      data.val().exercises.map((e: Exercises) => (counter += Number.parseInt(e.sets)));
       setTotal(counter);
     });
 
-    let interval = null;
+    let interval: number | undefined;
     if (timerActive) {
-      interval = setInterval(() => setSeconds(seconds + 1), 1000);
+      interval = window.setInterval(() => setSeconds(seconds + 1), 1000);
       if (seconds === 60) {
         setSeconds(0);
         setMinutes(minutes + 1);
       }
     }
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [timerActive, seconds]);
 
-  const handleWeightInput = (e) => {
-    console.log(e.target.value);
-  };
-
-  const handleCompleteSet = (totalSets) => {
+  const handleCompleteSet = (totalSets: string) => {
     console.log(`Total sets: ${totalSets}, ${currSet}`);
-    if (totalSets - 1 == currSet) {
+    if (Number.parseInt(totalSets) - 1 == currSet) {
       setCurrEx(currEx + 1);
       setCurrSet(0);
     } else {
       setCurrSet(currSet + 1);
     }
     setFraction(fraction + 1);
-    setPercentage((((fraction + 1) / total) * 100).toFixed(0));
+    setPercentage(Number.parseInt((((fraction + 1) / total) * 100).toFixed(0)));
     console.log(percentage);
   };
 
-  const handleCompleteProgram = (e) => {
+  const handleCompleteProgram = () => {
     let endTime = new Date().toISOString();
     fire
       .completeProgram(props.match.params.eventkey, startTime, endTime)
       .then((res) => {
         console.log(`Response: ${res}`);
         props.history.push("/routine");
-      });
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -110,7 +125,7 @@ const StartProgram = (props) => {
                 {timerActive ? "Pause Timer" : "Start Timer"}
               </button>
               <button
-                onClick={(e) => handleCompleteProgram(e)}
+                onClick={() => handleCompleteProgram()}
                 className={
                   percentage == 100
                     ? "SP-done-button"
@@ -121,7 +136,7 @@ const StartProgram = (props) => {
                 Done
               </button>
             </div>
-            {program.exercises.map((exercise, index) => {
+            {program.exercises.map((exercise: Exercises, index: number) => {
               return (
                 <div className="sp-overlay">
                   <div className="SP-exercise-headings">
@@ -133,9 +148,9 @@ const StartProgram = (props) => {
                     <h4 className="SP-exercise-sets"></h4>
                     {Array.from(
                       Array(Number.parseInt(exercise.sets)),
-                      (e, i) => {
+                      (e: string, i: number) => {
                         return (
-                          <h4 key={i} id={i} className="SP-exercise-sets">
+                          <h4 key={i} className="SP-exercise-sets">
                             Set {i + 1}
                           </h4>
                         );
@@ -146,9 +161,9 @@ const StartProgram = (props) => {
                     <h4 className="SP-exercise-sets">Reps</h4>
                     {Array.from(
                       Array(Number.parseInt(exercise.sets)),
-                      (e, i) => {
+                      (e: string, i: number) => {
                         return (
-                          <h4 key={i} id={i} className="SP-exercise-sets">
+                          <h4 key={i} className="SP-exercise-sets">
                             {exercise.reps}
                           </h4>
                         );
@@ -159,28 +174,28 @@ const StartProgram = (props) => {
                     <h4 className="SP-exercise-sets">Status</h4>
                     {Array.from(
                       Array(Number.parseInt(exercise.sets)),
-                      (e, i) => {
+                      (e: string, i: number) => {
                         return (
-                          <div key={i} id={i} className="SP-exercise-sets">
+                          <div key={i} className="SP-exercise-sets">
                             {index < currEx ||
-                            (index === currEx && i < currSet) ? (
-                              <i className="material-icons">done</i>
-                            ) : i === currSet && index === currEx ? (
-                              <button
-                                className="complete-set-button"
-                                id={"sp-status-" + index + "-" + i}
-                                onClick={() => handleCompleteSet(exercise.sets)}
-                              >
-                                <i
-                                  className="material-icons"
+                              (index === currEx && i < currSet) ? (
+                                <i className="material-icons">done</i>
+                              ) : i === currSet && index === currEx ? (
+                                <button
+                                  className="complete-set-button"
                                   id={"sp-status-" + index + "-" + i}
+                                  onClick={() => handleCompleteSet(exercise.sets)}
                                 >
-                                  play_arrow
+                                  <i
+                                    className="material-icons"
+                                    id={"sp-status-" + index + "-" + i}
+                                  >
+                                    play_arrow
                                 </i>
-                              </button>
-                            ) : (
-                              <h5>-</h5>
-                            )}
+                                </button>
+                              ) : (
+                                  <h5>-</h5>
+                                )}
                           </div>
                         );
                       }
@@ -192,10 +207,10 @@ const StartProgram = (props) => {
           </div>
         </div>
       ) : (
-        <div>
-          <button onClick={() => setStart(true)}>PRESS TO START</button>
-        </div>
-      )}
+          <div>
+            <button onClick={() => setStart(true)}>PRESS TO START</button>
+          </div>
+        )}
     </div>
   );
 };

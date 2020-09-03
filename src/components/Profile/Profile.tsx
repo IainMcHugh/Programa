@@ -18,12 +18,13 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     // get username + email
-    fire.getUserData().then((data) => {
+    fire.getUserData()
+    .then((data) => {
       setEmail(data.val().email);
       setUsername(data.val().username);
       setPrograms(data.val().programs);
       setSavedPrograms(data.val().saved_programs);
-    });
+    }).catch((err) => console.log(err));
   }, []);
 
   const logout = () => {

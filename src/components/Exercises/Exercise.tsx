@@ -8,7 +8,6 @@ interface Props {
 }
 
 const Exercise: React.FC<Props> = (props) => {
-    // console.log(this.props);
     if (props.createProgram) {
         return (
             <div className='exercise-container' id={props.exerciseId}>
