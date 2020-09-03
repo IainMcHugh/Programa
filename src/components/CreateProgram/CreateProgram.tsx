@@ -95,9 +95,6 @@ const CreateProgram: React.FC<Props> = (props) => {
 
     if(pKey === null) return null;
     props.history.push("/programs/" + pKey);
-    // pKey !== null
-    //   ? props.history.push("/programs/" + pKey)
-    //   : console.log("Error");
   };
 
   return (

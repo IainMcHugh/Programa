@@ -68,7 +68,7 @@ const ProgramContainer: React.FC<Props> = (props) => {
     e.preventDefault();
     const repeatValue = (e.currentTarget.elements.namedItem("repeat") as HTMLInputElement).value;
     const start = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
-    const end = new Date((e.currentTarget.elements.namedItem("beginentry") as HTMLInputElement).value);
+    const end = new Date((e.currentTarget.elements.namedItem("endentry") as HTMLInputElement).value);
 
     fire.getUserRoutines()
     .then((data) => {
